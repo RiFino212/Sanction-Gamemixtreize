@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Barème des Sanctions – Gamixtreize</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #0f172a, #1e293b);
+      color: white;
+      font-family: 'Inter', sans-serif;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      transform: scale(1.02);
+      background: rgba(255,255,255,0.1);
+    }
+    th {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+    td, th {
+      padding: 12px 16px;
+      text-align: left;
+    }
+    .category-title {
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #38bdf8;
+      padding-left: 0.75rem;
+    }
+    .badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+    .light { background-color: #10b98133; color: #10b981; }
+    .medium { background-color: #f59e0b33; color: #f59e0b; }
+    .serious { background-color: #f9731633; color: #f97316; }
+    .critical { background-color: #ef444433; color: #ef4444; }
+  </style>
+</head>
+
+<body x-data="sanctionApp()">
+
+  <header class="flex flex-col items-center py-8 border-b border-gray-700">
+    <img src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQdmLvjvjsMgjSJBGALR-_tFN8EprvvGOuX7R1jzDx6FMMVHYV5BDU3N-lRBpqDrP5k3ghooA" alt="Logo Gamixtreize" class="w-24 h-24 mb-4 rounded-full shadow-lg">
+    <h1 class="text-4xl font-bold text-cyan-400">Barème des Sanctions – Gamixtreize</h1>
+
+    <div class="mt-6 flex gap-4">
+      <input type="text" x-model="search" placeholder="Rechercher une infraction..." class="px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring focus:ring-cyan-500" />
+      <select x-model="filter" class="px-4 py-2 rounded-lg bg-gray-800 border border-gray-600 text-white">
+        <option value="all">🔍 Toutes les gravités</option>
+        <option value="light">🟢 Légère</option>
+        <option value="medium">🟡 Moyenne</option>
+        <option value="serious">🟠 Grave</option>
+        <option value="critical">🔴 Critique</option>
+      </select>
+    </div>
+  </header>
+
+  <main class="p-6 max-w-6xl mx-auto space-y-10">
+
+    <!-- Catégorie Discord -->
+    <section class="card p-6">
+      <h2 class="category-title text-cyan-300">🔇 Catégorie : Discord (Mute & Ban)</h2>
+      <table class="min-w-full border-collapse w-full">
+        <thead>
+          <tr>
+            <th>Infraction</th>
+            <th>Sanction</th>
+            <th>Gravité</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="s in filtered('discord')" :key="s.infraction">
+            <tr class="border-b border-gray-700 hover:bg-gray-800/50">
+              <td x-text="s.infraction"></td>
+              <td x-text="s.sanction"></td>
+              <td><span :class=\"'badge ' + s.gravity\" x-text=\"s.label\"></span></td>
+              <td x-text="s.desc"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Catégorie Stream -->
+    <section class="card p-6">
+      <h2 class="category-title text-cyan-300">👢 Catégorie : Kicks (Stream / Streamer)</h2>
+      <table class="min-w-full border-collapse w-full">
+        <thead>
+          <tr>
+            <th>Infraction</th>
+            <th>Sanction</th>
+            <th>Gravité</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="s in filtered('stream')" :key="s.infraction">
+            <tr class="border-b border-gray-700 hover:bg-gray-800/50">
+              <td x-text="s.infraction"></td>
+              <td x-text="s.sanction"></td>
+              <td><span :class=\"'badge ' + s.gravity\" x-text=\"s.label\"></span></td>
+              <td x-text="s.desc"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    function sanctionApp() {
+      return {
+        search: '',
+        filter: 'all',
+        sanctions: [
+          // --- DISCORD ---
+          { type:'discord', infraction:'Comportement toxique', sanction:'Mute 24h', desc:'Attitude négative, provocations répétées.', gravity:'medium', label:'Moyenne' },
+          { type:'discord', infraction:'Spam / Flood', sanction:'Mute 6h', desc:'Messages ou emojis répétés inutilement.', gravity:'light', label:'Légère' },
+          { type:'discord', infraction:'Ping abusif', sanction:'Mute 12h', desc:'Pings excessifs sans raison valable.', gravity:'medium', label:'Moyenne' },
+          { type:'discord', infraction:'Publicité non autorisée', sanction:'Mute 12h', desc:'Partage de liens Discord, Twitch, YouTube non validés.', gravity:'medium', label:'Moyenne' },
+          { type:'discord', infraction:'NSFW / contenu choquant', sanction:'Ban définitif', desc:'Contenu sexuel, gore ou violent.', gravity:'critical', label:'Critique' },
+          { type:'discord', infraction:'Propos discriminatoires', sanction:'Ban définitif', desc:'Racisme, sexisme, homophobie, etc.', gravity:'critical', label:'Critique' },
+          { type:'discord', infraction:'Partage de contenu illégal', sanction:'Ban définitif', desc:'Cheats, cracks, piratage ou contenu illégal.', gravity:'critical', label:'Critique' },
+          { type:'discord', infraction:'Diffusion d’informations personnelles', sanction:'Ban définitif', desc:'Doxxing, partage de données privées.', gravity:'critical', label:'Critique' },
+          { type:'discord', infraction:'Troll / Provocation', sanction:'Mute 12h', desc:'Provoquer volontairement un conflit ou déranger les autres.', gravity:'medium', label:'Moyenne' },
+          { type:'discord', infraction:'Drama / Conflit public', sanction:'Mute 24h', desc:'Règlement de compte dans les salons publics.', gravity:'medium', label:'Moyenne' },
+          { type:'discord', infraction:'Spam vocal / bruitage', sanction:'Mute vocal 24h', desc:'Perturbation sonore volontaire.', gravity:'serious', label:'Grave' },
+          { type:'discord', infraction:'Raid Discord / Scam', sanction:'Ban définitif', desc:'Lien frauduleux ou attaque organisée.', gravity:'critical', label:'Critique' },
+
+          // --- STREAM / KICKS ---
+          { type:'stream', infraction:'Comportement inapproprié en stream', sanction:'Kick 1 jour', desc:'Langage déplacé, manque de respect envers les viewers.', gravity:'medium', label:'Moyenne' },
+          { type:'stream', infraction:'Non-respect des règles communautaires', sanction:'Kick 3 jours', desc:'Ignorer le règlement ou les directives du staff.', gravity:'serious', label:'Grave' },
+          { type:'stream', infraction:'Diffusion d’un contenu non autorisé', sanction:'Kick 7 jours', desc:'Contenu inapproprié ou hors sujet.', gravity:'serious', label:'Grave' },
+          { type:'stream', infraction:'Drama ou conflit en live', sanction:'Kick 3 jours', desc:'Provoquer ou alimenter un conflit sur le stream.', gravity:'serious', label:'Grave' },
+          { type:'stream', infraction:'Propos discriminatoires ou diffamatoires', sanction:'Kick définitif', desc:'Propos haineux ou discriminatoires.', gravity:'critical', label:'Critique' },
+          { type:'stream', infraction:'Stream non autorisé pendant un event', sanction:'Kick 1 jour', desc:'Diffuser un événement communautaire sans validation.', gravity:'medium', label:'Moyenne' },
+          { type:'stream', infraction:'Manque de professionnalisme', sanction:'Kick 3 jours', desc:'Comportement nuisant à l’image de la communauté.', gravity:'serious', label:'Grave' },
+          { type:'stream', infraction:'Fausse information en live', sanction:'Kick 2 jours', desc:'Diffuser de fausses informations concernant le serveur.', gravity:'medium', label:'Moyenne' },
+        ],
+
+        filtered(type) {
+          return this.sanctions.filter(s => 
+            s.type === type &&
+            (this.filter === 'all' || s.gravity === this.filter) &&
+            (s.infraction.toLowerCase().includes(this.search.toLowerCase()) ||
+             s.desc.toLowerCase().includes(this.search.toLowerCase()))
+          );
+        }
+      };
+    }
+  </script>
+</body>
+</html>
